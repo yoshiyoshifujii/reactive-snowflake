@@ -7,6 +7,17 @@ object IdWorker {
 
   final case class DatacenterId(value: Long)
   final case class WorkerId(value: Long)
+  final case class SequenceId(value: Long)
+
+  object SequenceId {
+    val Default: SequenceId = SequenceId(0L)
+  }
+
+  final case class LastTimestamp(value: Long)
+
+  object LastTimestamp {
+    val Default: LastTimestamp = LastTimestamp(-1L)
+  }
 
   sealed trait Reply
   final case class IdGenerated(id: Long)
@@ -14,18 +25,23 @@ object IdWorker {
   sealed trait Command
   final case class GenerateId(reply: ActorRef[IdGenerated]) extends Command
 
-  def behavior(dcId: DatacenterId, wId: WorkerId): Behavior[Command] =
+  def behavior(
+      dcId: DatacenterId,
+      wId: WorkerId,
+      seqId: SequenceId = SequenceId.Default,
+      lastTime: LastTimestamp = LastTimestamp.Default
+  )(implicit timeGen: => Long = System.currentTimeMillis()): Behavior[Command] =
     Behaviors.setup { context =>
       val worker = new IdWorkerImpl {
         override protected val datacenterId: Long = dcId.value
         override protected val workerId: Long     = wId.value
       }
 
-      var sequenceId: Long = 0L
-      var lastTimestamp    = -1L
+      var sequenceId: Long = seqId.value
+      var lastTimestamp    = lastTime.value
 
       Behaviors.receiveMessage[Command] { case msg @ GenerateId(replyTo) =>
-        val NextId(idOpt, timestamp, nextSequence) = worker.nextId(timeGen(), lastTimestamp, sequenceId)
+        val NextId(idOpt, timestamp, nextSequence) = worker.nextId(timeGen, lastTimestamp, sequenceId)
         sequenceId = nextSequence
         lastTimestamp = timestamp
 
@@ -39,7 +55,5 @@ object IdWorker {
         }
       }
     }
-
-  private def timeGen(): Long = System.currentTimeMillis()
 
 }
