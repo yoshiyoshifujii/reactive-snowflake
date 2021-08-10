@@ -1,0 +1,50 @@
+package com.github.yoshiyoshifujii.reactive.snowflake
+
+import akka.actor.testkit.typed.scaladsl.ActorTestKit
+import com.github.yoshiyoshifujii.reactive.snowflake.IdWorker.{ DatacenterId, GenerateId, IdGenerated, WorkerId }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.freespec.AnyFreeSpec
+import scala.concurrent.duration._
+
+class IdWorkerSpec extends AnyFreeSpec with BeforeAndAfterAll {
+
+  private val testKit = ActorTestKit()
+
+  override def afterAll(): Unit = testKit.shutdownTestKit()
+
+  "IdWorker" - {
+
+    val dcId1     = DatacenterId(1L)
+    val workerId1 = WorkerId(1L)
+
+    "generate id" in {
+      val probe    = testKit.createTestProbe[IdGenerated]()
+      val idWorker = testKit.spawn(IdWorker.behavior(dcId1, workerId1))
+      idWorker ! GenerateId(probe.ref)
+      probe.expectMessageType[IdGenerated]
+    }
+
+    "generate increasing ids" in {
+      val probe    = testKit.createTestProbe[IdGenerated]()
+      val idWorker = testKit.spawn(IdWorker.behavior(dcId1, workerId1))
+      (1 to 100).foreach(_ => idWorker ! GenerateId(probe.ref))
+      probe.within(5.seconds) {
+        probe.receiveMessages(100).foldLeft(0L) { (prev, current) =>
+          assert(prev < current.id)
+          current.id
+        }
+      }
+    }
+
+    "generate 1 million ids quickly" in {
+      val probe    = testKit.createTestProbe[IdGenerated]()
+      val idWorker = testKit.spawn(IdWorker.behavior(dcId1, workerId1))
+      val t        = System.currentTimeMillis()
+      (1 to 1_000_000).foreach(_ => idWorker ! GenerateId(probe.ref))
+      probe.receiveMessages(1_000_000)
+      val t2 = System.currentTimeMillis()
+      println("generated 1,000,000 ids in %d ms, or %,.0f ids/second".format(t2 - t, 1000000000.0 / (t2 - t)))
+    }
+  }
+
+}
