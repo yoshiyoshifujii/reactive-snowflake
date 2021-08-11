@@ -23,6 +23,8 @@ lazy val reactiveSnowflakeCore = project
   )
 
 lazy val reactiveSnowflakeCluster = project
+  .enablePlugins(MultiJvmPlugin)
+  .configs(MultiJvm)
   .in(file(s"$baseName-cluster"))
   .settings(baseSettings)
   .settings(
@@ -31,6 +33,8 @@ lazy val reactiveSnowflakeCluster = project
       "com.typesafe.akka" %% "akka-cluster-typed"          % akkaVersion,
       "com.typesafe.akka" %% "akka-cluster-sharding-typed" % akkaVersion,
       "com.typesafe.akka" %% "akka-serialization-jackson"  % akkaVersion,
+      "org.scalatest"     %% "scalatest"                   % "3.2.9"     % Test,
+      "com.typesafe.akka" %% "akka-actor-testkit-typed"    % akkaVersion % Test,
       "com.typesafe.akka" %% "akka-multi-node-testkit"     % akkaVersion % Test
     )
   ).dependsOn(reactiveSnowflakeCore)

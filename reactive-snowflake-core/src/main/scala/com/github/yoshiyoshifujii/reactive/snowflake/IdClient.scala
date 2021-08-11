@@ -18,4 +18,5 @@ object IdClient {
       }
     }
 
+  val name: String = "IdClient"
 }

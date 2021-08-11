@@ -61,4 +61,6 @@ object ShardedIdGenerator {
       entityRef ! msg
       Behaviors.same
     }
+
+  val name: String = "IdGenerator"
 }
