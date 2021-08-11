@@ -5,8 +5,16 @@ import akka.actor.typed.scaladsl.Behaviors
 
 object IdWorker {
 
-  final case class DatacenterId(value: Long)
-  final case class WorkerId(value: Long)
+  final case class DatacenterId(value: Int) {
+    require(value >= 0)
+    require(value < 32)
+  }
+
+  final case class WorkerId(value: Int) {
+    require(value >= 0)
+    require(value < 32)
+  }
+
   final case class SequenceId(value: Long)
 
   object SequenceId {
@@ -64,5 +72,7 @@ object IdWorker {
         }
       }
     }
+
+  def name(datacenterId: DatacenterId, workerId: WorkerId): String = s"idWorker-${datacenterId.value}-${workerId.value}"
 
 }

@@ -13,8 +13,8 @@ class IdWorkerClockFluctuationSpec extends AnyFreeSpec with BeforeAndAfterAll {
 
   "idWorker under fluctuating clock" - {
 
-    val dcId1     = DatacenterId(1L)
-    val workerId1 = WorkerId(1L)
+    val dcId1     = DatacenterId(1)
+    val workerId1 = WorkerId(1)
 
     "generate only unique ids, even when time goes backwards" in {
       val n = 1_000

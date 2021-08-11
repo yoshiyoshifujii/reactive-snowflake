@@ -22,8 +22,8 @@ class IdWorkerSpec extends AnyFreeSpec with BeforeAndAfterAll {
 
   "IdWorker" - {
 
-    val dcId1     = DatacenterId(1L)
-    val workerId1 = WorkerId(1L)
+    val dcId1     = DatacenterId(1)
+    val workerId1 = WorkerId(1)
 
     "generate id" in {
       val probe    = testKit.createTestProbe[IdGenerated]()
@@ -70,7 +70,7 @@ class IdWorkerSpec extends AnyFreeSpec with BeforeAndAfterAll {
 
     "generate only unique ids" in {
       val probe    = testKit.createTestProbe[IdGenerated]()
-      val idWorker = testKit.spawn(IdWorker.behavior(DatacenterId(3L), WorkerId(3L)))
+      val idWorker = testKit.spawn(IdWorker.behavior(DatacenterId(3), WorkerId(3)))
       idWorker ! GenerateId(probe.ref)
       probe.expectMessageType[IdGenerated]
     }
@@ -78,7 +78,7 @@ class IdWorkerSpec extends AnyFreeSpec with BeforeAndAfterAll {
     "generate ids over 50 billion" in {
       val n        = 2_000_000
       val probe    = testKit.createTestProbe[IdGenerated]()
-      val idWorker = testKit.spawn(IdWorker.behavior(DatacenterId(0L), WorkerId(0L)))
+      val idWorker = testKit.spawn(IdWorker.behavior(DatacenterId(0), WorkerId(0)))
       1 to n foreach { _ =>
         idWorker ! GenerateId(probe.ref)
       }
