@@ -6,9 +6,9 @@ import akka.actor.typed.scaladsl.adapter.ClassicActorSystemOps
 import akka.cluster.ClusterEvent
 import akka.cluster.sharding.typed.ShardingEnvelope
 import akka.cluster.sharding.typed.scaladsl.ClusterSharding
-import akka.cluster.typed.{Cluster, Join, Subscribe, Unsubscribe}
+import akka.cluster.typed.{ Cluster, Join, Subscribe, Unsubscribe }
 import akka.remote.testconductor.RoleName
-import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec}
+import akka.remote.testkit.{ MultiNodeConfig, MultiNodeSpec }
 import akka.testkit.TestDuration
 import com.typesafe.config.ConfigFactory
 
@@ -91,17 +91,16 @@ class ShardedIdGeneratorSpec extends MultiNodeSpec(ShardedIdGeneratorConfig) wit
     "generate id" in within(dilated) {
       runOn(worker1_1) {
         val clusterSharding = ClusterSharding(typedSystem)
-        val datacenterMask = 0x00000000003E0000L
-        val datacenterId = IdWorker.DatacenterId(0x1F)
-        val idGenerator = system.spawn(ShardedIdGenerator.ofProxy(clusterSharding), ShardedIdGenerator.name)
-        val idClient = system.spawn(IdClient.behavior(datacenterId, idGenerator), IdClient.name)
-        val probe = TestProbe[IdWorker.IdGenerated]
+        val datacenterMask  = 0x00000000003e0000L
+        val datacenterId    = IdWorker.DatacenterId(0x1f)
+        val idGenerator     = system.spawn(ShardedIdGenerator.ofProxy(clusterSharding), ShardedIdGenerator.name)
+        val idClient        = system.spawn(IdClient.behavior(datacenterId, idGenerator), IdClient.name)
+        val probe           = TestProbe[IdWorker.IdGenerated]
         (0 until 100).foreach { _ =>
           idClient ! IdClient.GenerateId(probe.ref)
         }
-        probe.receiveMessages(100).foreach {
-          case IdWorker.IdGenerated(id) =>
-            assert(((id & datacenterMask) >> 17) === datacenterId.value)
+        probe.receiveMessages(100).foreach { case IdWorker.IdGenerated(id) =>
+          assert(((id & datacenterMask) >> 17) === datacenterId.value)
         }
       }
     }
