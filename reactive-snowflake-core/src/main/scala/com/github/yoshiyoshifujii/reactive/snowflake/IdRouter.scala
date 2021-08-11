@@ -1,7 +1,7 @@
 package com.github.yoshiyoshifujii.reactive.snowflake
 
-import akka.actor.typed.{ ActorRef, Behavior }
 import akka.actor.typed.scaladsl.{ ActorContext, Behaviors }
+import akka.actor.typed.{ ActorRef, Behavior }
 
 object IdRouter {
   sealed trait Command

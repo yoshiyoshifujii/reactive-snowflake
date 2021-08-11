@@ -1,7 +1,7 @@
 package com.github.yoshiyoshifujii.reactive.snowflake
 
-import akka.actor.typed.{ ActorRef, Behavior, PreRestart }
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ ActorRef, Behavior }
 
 object IdWorker {
 
@@ -13,6 +13,10 @@ object IdWorker {
   final case class WorkerId(value: Int) {
     require(value >= 0)
     require(value < 32)
+  }
+
+  object WorkerId {
+    def generate(value: Int): WorkerId = WorkerId(value % 32)
   }
 
   final case class SequenceId(value: Long)
