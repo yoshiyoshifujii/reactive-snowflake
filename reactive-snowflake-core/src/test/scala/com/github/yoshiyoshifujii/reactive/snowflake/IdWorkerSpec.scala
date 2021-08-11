@@ -61,7 +61,7 @@ class IdWorkerSpec extends AnyFreeSpec with BeforeAndAfterAll {
       val timeSeq     = Vector(timestamp, timestamp, timestamp + 1L)
       val timeSeqIter = timeSeq.iterator
       val probe       = testKit.createTestProbe[IdGenerated]()
-      val idWorker    = testKit.spawn(IdWorker.behavior(dcId1, workerId1, seqId, lastTime)(timeSeqIter.next()))
+      val idWorker    = testKit.spawn(IdWorker.behavior(dcId1, workerId1, seqId, lastTime)(_ => timeSeqIter.next()))
       idWorker ! GenerateId(probe.ref)
       val id1 = probe.expectMessageType[IdGenerated].id
       assert(extractTimestamp(id1) === timestamp + 1)

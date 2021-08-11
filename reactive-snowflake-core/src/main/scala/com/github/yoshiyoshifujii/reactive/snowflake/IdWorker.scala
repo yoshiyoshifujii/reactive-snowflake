@@ -30,7 +30,7 @@ object IdWorker {
       wId: WorkerId,
       seqId: SequenceId = SequenceId.Default,
       lastTime: LastTimestamp = LastTimestamp.Default
-  )(implicit timeGen: => Long = System.currentTimeMillis()): Behavior[Command] =
+  )(implicit timeGen: Unit => Long = _ => System.currentTimeMillis()): Behavior[Command] =
     Behaviors.setup { context =>
       val worker = new IdWorkerImpl {
         override protected val datacenterId: Long = dcId.value
@@ -41,15 +41,24 @@ object IdWorker {
       var lastTimestamp    = lastTime.value
 
       Behaviors.receiveMessage[Command] { case msg @ GenerateId(replyTo) =>
-        val NextId(idOpt, timestamp, nextSequence) = worker.nextId(timeGen, lastTimestamp, sequenceId)
-        sequenceId = nextSequence
-        lastTimestamp = timestamp
+        try {
+          val NextId(idOpt, timestamp, nextSequence) = worker.nextId(timeGen(), lastTimestamp, sequenceId)
+          sequenceId = nextSequence
+          lastTimestamp = timestamp
 
-        idOpt match {
-          case Some(id) =>
-            replyTo ! IdGenerated(id)
-            Behaviors.same
-          case None =>
+          idOpt match {
+            case Some(id) =>
+              replyTo ! IdGenerated(id)
+              Behaviors.same
+            case None =>
+              context.log.debug("retrying to avoid id duplication")
+              context.self ! msg
+              Behaviors.same
+          }
+        } catch {
+          case InvalidSystemClock(_, timestamp, lastSequenceId) =>
+            sequenceId = lastSequenceId
+            lastTimestamp = timestamp
             context.self ! msg
             Behaviors.same
         }
