@@ -12,6 +12,9 @@ object IdRouter {
       reply: ActorRef[IdWorker.IdGenerated]
   ) extends Command
 
+  final case object Stop extends Command
+  final case object Idle extends Command
+
   private def createIdWorker(
       datacenterId: IdWorker.DatacenterId,
       workerId: IdWorker.WorkerId,
@@ -23,7 +26,7 @@ object IdRouter {
 
   def behavior: Behavior[Command] =
     Behaviors.setup { implicit context =>
-      Behaviors.receiveMessage { case GenerateId(datacenterId, workerId, replyTo) =>
+      Behaviors.receiveMessagePartial { case GenerateId(datacenterId, workerId, replyTo) =>
         val childName = IdWorker.name(datacenterId, workerId)
         context.child(childName) match {
           case Some(idWorker) =>
@@ -35,4 +38,5 @@ object IdRouter {
       }
     }
 
+  val name: String = "IdRouter"
 }
