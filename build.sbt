@@ -3,7 +3,7 @@ val baseName    = "reactive-snowflake"
 
 val baseSettings = Seq(
   organization := "com.github.yoshiyoshifujii",
-  scalaVersion := "2.13.6"
+  scalaVersion := "2.13.7"
 )
 
 lazy val reactiveSnowflakeCore = project
