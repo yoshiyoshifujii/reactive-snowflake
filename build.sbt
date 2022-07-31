@@ -17,7 +17,7 @@ lazy val reactiveSnowflakeCore = project
       "ch.qos.logback"     % "logback-classic"  % "1.2.11" excludeAll (
         ExclusionRule(organization = "org.slf4j")
       ),
-      "org.scalatest"     %% "scalatest"                % "3.2.12"     % Test,
+      "org.scalatest"     %% "scalatest"                % "3.2.13"     % Test,
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test
     )
   )
@@ -33,7 +33,7 @@ lazy val reactiveSnowflakeCluster = project
       "com.typesafe.akka" %% "akka-cluster-typed"          % akkaVersion,
       "com.typesafe.akka" %% "akka-cluster-sharding-typed" % akkaVersion,
       "com.typesafe.akka" %% "akka-serialization-jackson"  % akkaVersion,
-      "org.scalatest"     %% "scalatest"                   % "3.2.12"     % Test,
+      "org.scalatest"     %% "scalatest"                   % "3.2.13"     % Test,
       "com.typesafe.akka" %% "akka-actor-testkit-typed"    % akkaVersion % Test,
       "com.typesafe.akka" %% "akka-multi-node-testkit"     % akkaVersion % Test
     )
