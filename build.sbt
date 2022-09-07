@@ -1,4 +1,4 @@
-val akkaVersion = "2.6.19"
+val akkaVersion = "2.6.20"
 val baseName    = "reactive-snowflake"
 
 val baseSettings = Seq(
