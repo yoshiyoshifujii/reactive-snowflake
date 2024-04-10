@@ -14,7 +14,7 @@ lazy val reactiveSnowflakeCore = project
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion,
       "com.typesafe.akka" %% "akka-slf4j"       % akkaVersion,
-      "ch.qos.logback"     % "logback-classic"  % "1.5.3" excludeAll (
+      "ch.qos.logback"     % "logback-classic"  % "1.5.4" excludeAll (
         ExclusionRule(organization = "org.slf4j")
       ),
       "org.scalatest"     %% "scalatest"                % "3.2.18"     % Test,
